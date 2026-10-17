@@ -5,34 +5,40 @@ import 'package:weather_app_api/Pages/SearchPage.dart';
 import 'package:weather_app_api/cubit/weather_cubit.dart';
 import 'package:weather_app_api/cubit/weather_state.dart';
 
-String? image;
-WeatherModel? weatherData;
-
 class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
   @override
   Widget build(BuildContext context) {
-    try {
-      image = weatherData!.Icon;
-    } catch (e) {
-      const Text("No Data Image");
-    }
+    return BlocBuilder<WeatherCubit, WeatherState>(
+      builder: (context, state) {
+        final WeatherModel? weatherData = state is WeatherSuccessState
+            ? state.weatherModel
+            : null;
 
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: weatherData?.getThemeColor(),
-        actions: [
-          IconButton(
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return SearchPage();
-                }));
-              },
-              icon: const Icon(Icons.search))
-        ],
-        title: const Text('Weather App'),
-      ),
-      body: BlocBuilder<WeatherCubit, WeatherState>(
-        builder: (context, state) {
+        return Scaffold(
+          appBar: AppBar(
+            backgroundColor: weatherData?.getThemeColor() ?? Colors.blue,
+            actions: [
+              IconButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => SearchPage()),
+                  );
+                },
+                icon: const Icon(Icons.search),
+              ),
+            ],
+            title: const Text('Weather App'),
+          ),
+          body: _buildBody(state),
+        );
+      },
+    );
+  }
+
+  Widget _buildBody(WeatherState state) {
           if (state is WeatherLoadingState) {
             return const Center(
               child: CircularProgressIndicator(),
@@ -46,9 +52,6 @@ class HomePage extends StatelessWidget {
           } else {
             return const DeafultShowWeather();
           }
-        },
-      ),
-    );
   }
 }
 
@@ -85,9 +88,9 @@ class DeafultShowWeather extends StatelessWidget {
 }
 
 class ShowWeatherData extends StatelessWidget {
-  final WeatherModel? weatherData;
+  final WeatherModel weatherData;
 
-  ShowWeatherData({
+  const ShowWeatherData({
     required this.weatherData,
     super.key,
   });
@@ -97,9 +100,9 @@ class ShowWeatherData extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
           gradient: LinearGradient(colors: [
-        weatherData!.getThemeColor(),
-        weatherData!.getThemeColor()[300]!,
-        weatherData!.getThemeColor()[100]!
+        weatherData.getThemeColor(),
+        weatherData.getThemeColor()[300]!,
+        weatherData.getThemeColor()[100]!
       ], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
       child: Column(
         children: [
@@ -107,11 +110,11 @@ class ShowWeatherData extends StatelessWidget {
             height: 110,
           ),
           Text(
-            weatherData!.CityName,
+            weatherData.CityName,
             style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
           ),
           Text(
-            weatherData!.Date,
+            weatherData.Date,
             style: const TextStyle(
               fontSize: 22,
             ),
@@ -122,20 +125,20 @@ class ShowWeatherData extends StatelessWidget {
               SizedBox(
                   width: 70,
                   height: 70,
-                  child: Image.network("https:${weatherData!.Icon}")),
+                  child: Image.network("https:${weatherData.Icon}")),
               Text(
-                weatherData!.Temp.toString(),
+                weatherData.Temp.toString(),
                 style:
                     const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
               ),
               Column(
                 children: [
                   Text(
-                    weatherData!.MaxTemp.toString(),
+                    weatherData.MaxTemp.toString(),
                     style: const TextStyle(fontSize: 23),
                   ),
                   Text(
-                    weatherData!.MinTemp.toString(),
+                    weatherData.MinTemp.toString(),
                     style: const TextStyle(fontSize: 23),
                   )
                 ],
@@ -145,7 +148,7 @@ class ShowWeatherData extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(left: 2),
             child: Text(
-              weatherData!.WeatherState,
+              weatherData.WeatherState,
               style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
             ),
           )
