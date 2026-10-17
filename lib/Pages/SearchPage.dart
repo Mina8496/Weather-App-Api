@@ -27,7 +27,7 @@ class SearchPage extends StatelessWidget {
               CityName = data;
               WeatherServises servises = WeatherServises();
               WeatherModel? weather =
-                  await servises.getWeatherServises(CityName!);
+                  await servises.getWeatherServises(cityName: CityName!);
               Provider.of<WeatherProvider>(context, listen: false).WeatherData =
                   weather;
               Navigator.pop(context);
@@ -41,7 +41,7 @@ class SearchPage extends StatelessWidget {
                     onTap: () async {
                       WeatherServises servises = WeatherServises();
                       WeatherModel? weather =
-                          await servises.getWeatherServises(CityName!);
+                          await servises.getWeatherServises(cityName:  CityName!);
                       Provider.of<WeatherProvider>(context, listen: false)
                           .WeatherData = weather;
                       Navigator.pop(context);

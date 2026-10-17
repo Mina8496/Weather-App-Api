@@ -51,7 +51,6 @@ class WeatherModel {
 
   @override
   String toString() {
-    // TODO: implement toString
     return "City name $CityName, temp = $Temp icon= $Icon";
   }
 }
