@@ -1,5 +1,7 @@
 abstract class WeatherState {}
 
+class WeatherinitialState extends WeatherState {}
+
 class WeatherLoadingState extends WeatherState {}
 
 class WeatherSuccessState extends WeatherState {}

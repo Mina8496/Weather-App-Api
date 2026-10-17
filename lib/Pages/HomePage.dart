@@ -1,30 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:weather_app_api/Models/WeatherModel.dart';
 import 'package:weather_app_api/Pages/SearchPage.dart';
-import 'package:weather_app_api/providers/Weather_provider.dart';
-
-class HomePage extends StatefulWidget {
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
+import 'package:weather_app_api/cubit/weather_cubit.dart';
+import 'package:weather_app_api/cubit/weather_state.dart';
 
 String? image;
+WeatherModel? weatherData;
 
-class _HomePageState extends State<HomePage> {
+class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    WeatherModel? WeatherData =
-        Provider.of<WeatherProvider>(context).WeatherData;
     try {
-      image = WeatherData!.Icon;
+      // image = WeatherData!.Icon;
     } catch (e) {
       Text("No Data Image");
     }
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: WeatherData?.getThemeColor(),
+        // backgroundColor: WeatherData?.getThemeColor(),
         actions: [
           IconButton(
               onPressed: () {
@@ -36,8 +32,79 @@ class _HomePageState extends State<HomePage> {
         ],
         title: const Text('Weather App'),
       ),
-      body: Provider.of<WeatherProvider>(context).WeatherData == null
-          ? const Padding(
+      body: BlocBuilder<WeatherCubit, WeatherState>(
+        builder: (context, state) {
+          if (state is WeatherLoadingState) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (state is WeatherSuccessState) {
+            return Container(
+              decoration: BoxDecoration(
+                  gradient: LinearGradient(colors: [
+                weatherData!.getThemeColor(),
+                weatherData!.getThemeColor()[300]!,
+                weatherData!.getThemeColor()[100]!
+              ], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
+              child: Column(
+                children: [
+                  const SizedBox(
+                    height: 110,
+                  ),
+                  Text(
+                    weatherData!.CityName,
+                    style: const TextStyle(
+                        fontSize: 32, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    weatherData!.Date,
+                    style: const TextStyle(
+                      fontSize: 22,
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      SizedBox(
+                          width: 70,
+                          height: 70,
+                          child: Image.network("https:$image")),
+                      Text(
+                        weatherData!.Temp.toString(),
+                        style: const TextStyle(
+                            fontSize: 30, fontWeight: FontWeight.bold),
+                      ),
+                      Column(
+                        children: [
+                          Text(
+                            weatherData!.MaxTemp.toString(),
+                            style: const TextStyle(fontSize: 23),
+                          ),
+                          Text(
+                            weatherData!.MinTemp.toString(),
+                            style: const TextStyle(fontSize: 23),
+                          )
+                        ],
+                      )
+                    ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 2),
+                    child: Text(
+                      weatherData!.WeatherState,
+                      style: const TextStyle(
+                          fontSize: 30, fontWeight: FontWeight.bold),
+                    ),
+                  )
+                ],
+              ),
+            );
+          } else if (state is WeatherFailureState) {
+            return const Center(
+              child: Text('somethng went wrong please try again'),
+            );
+          } else {
+            return const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16),
               child: Center(
                 child: Column(
@@ -58,67 +125,10 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-            )
-          : Container(
-              decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: [
-                WeatherData!.getThemeColor(),
-                WeatherData.getThemeColor()[300]!,
-                WeatherData.getThemeColor()[100]!
-              ], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
-              child: Column(
-                children: [
-                  const SizedBox(
-                    height: 110,
-                  ),
-                  Text(
-                    WeatherData.CityName,
-                    style: const TextStyle(
-                        fontSize: 32, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    WeatherData.Date,
-                    style: const TextStyle(
-                      fontSize: 22,
-                    ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      SizedBox(
-                          width: 70,
-                          height: 70,
-                          child: Image.network("https:$image")),
-                      Text(
-                        WeatherData.Temp.toString(),
-                        style: const TextStyle(
-                            fontSize: 30, fontWeight: FontWeight.bold),
-                      ),
-                      Column(
-                        children: [
-                          Text(
-                            WeatherData.MaxTemp.toString(),
-                            style: const TextStyle(fontSize: 23),
-                          ),
-                          Text(
-                            WeatherData.MinTemp.toString(),
-                            style: const TextStyle(fontSize: 23),
-                          )
-                        ],
-                      )
-                    ],
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 2),
-                    child: Text(
-                      WeatherData.WeatherState,
-                      style: const TextStyle(
-                          fontSize: 30, fontWeight: FontWeight.bold),
-                    ),
-                  )
-                ],
-              ),
-            ),
+            );
+          }
+        },
+      ),
     );
   }
 }
