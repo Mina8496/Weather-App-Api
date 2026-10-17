@@ -20,13 +20,12 @@ class WeatherApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-          // primarySwatch:
-          //     Provider.of<WeatherProvider>(context).WeatherData == null
-          //         ? Colors.blue
-          //         : Provider.of<WeatherProvider>(context)
-          //             .WeatherData!
-          //             .getThemeColor()
-          ),
+          primarySwatch:
+              BlocProvider.of<WeatherCubit>(context).weatherModel == null
+                  ? Colors.blue
+                  : BlocProvider.of<WeatherCubit>(context)
+                      .weatherModel!
+                      .getThemeColor()),
       home: HomePage(),
     );
   }
